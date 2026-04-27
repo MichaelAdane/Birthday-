@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heldu 🎂</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Poppins',sans-serif;
+  background:#0f0f14;
+  color:white;
+  overflow:hidden;
+}
+
+/* Cursor */
+.cursor{
+  width:20px;height:20px;border-radius:50%;
+  position:fixed;background:rgba(255,255,255,0.3);
+  pointer-events:none;transform:translate(-50%,-50%);
+}
+
+/* Pages */
+.page{
+  position:absolute;width:100%;height:100%;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  opacity:0;transform:translateY(40px);
+  transition:.6s ease;
+}
+.active{opacity:1;transform:translateY(0)}
+
+/* Card */
+.card{
+  background:rgba(255,255,255,0.05);
+  padding:30px;border-radius:20px;
+  backdrop-filter:blur(12px);
+  text-align:center;max-width:90%;
+}
+
+/* Button */
+button{
+  margin-top:20px;padding:12px 25px;
+  border:none;border-radius:10px;
+  background:white;color:black;
+  font-weight:600;cursor:pointer;
+}
+
+/* Input */
+input{
+  padding:10px;border-radius:8px;
+  border:none;margin-top:15px;text-align:center;
+}
+
+/* Chat */
+.chat{text-align:left;max-width:300px}
+.msg{
+  background:#1f1f2a;
+  padding:10px;border-radius:10px;
+  margin:5px 0;
+}
+
+/* Image */
+img{
+  width:250px;border-radius:12px;
+  margin-top:15px;
+}
+
+/* Hidden */
+.hidden{opacity:0}
+.show{opacity:1;transition:.5s}
+
+/* Confetti */
+canvas{
+  position:fixed;top:0;left:0;
+  pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="confetti"></canvas>
+
+<!-- 🔊 Replace with real links -->
+<audio id="music" loop src="music.mp3"></audio>
+<audio id="voice" src="voice.mp3"></audio>
+
+<!-- PASSWORD -->
+<div class="page active" id="p1">
+  <div class="card">
+    <h2>Enter Password 🔐</h2>
+    <input id="pass" placeholder="Hint: her nickname">
+    <br>
+    <button onclick="check()">Unlock</button>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="page" id="p2">
+  <div class="card">
+    <h1>Happy Birthday Heldu 🎉</h1>
+    <p id="typing"></p>
+    <button onclick="next(3)">Continue</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="page" id="p3">
+  <div class="card chat" id="chatBox"></div>
+  <button onclick="next(4)">Next</button>
+</div>
+
+<!-- MEMORIES -->
+<div class="page" id="p4">
+  <div class="card">
+    <h2>Memories 📸</h2>
+    <img id="slide" src="img1.jpg">
+    <button onclick="next(5)">Next</button>
+  </div>
+</div>
+
+<!-- SECRET -->
+<div class="page" id="p5">
+  <div class="card">
+    <h2>Tap for a secret 👀</h2>
+    <button onclick="reveal()">Reveal</button>
+    <p id="secret" class="hidden">You mean more than you know ❤️</p>
+    <button onclick="next(6)">Final</button>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div class="page" id="p6">
+  <div class="card">
+    <h1>Heldu 💌</h1>
+    <p>
+      You bring something rare into my life.<br><br>
+      I appreciate you more than words can explain.<br><br>
+      Happy Birthday ❤️
+    </p>
+  </div>
+</div>
+
+<script>
+// Cursor
+document.addEventListener("mousemove", e=>{
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
+});
+
+// Password
+function check(){
+  if(document.getElementById("pass").value.toLowerCase()==="hel"){
+    next(2);
+  } else alert("Wrong password");
+}
+
+// Navigation
+function next(p){
+  document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+  document.getElementById("p"+p).classList.add("active");
+  document.getElementById("music").play().catch(()=>{});
+
+  if(p===3) startChat();
+  if(p===6){
+    document.getElementById("voice").play();
+    confetti();
+  }
+}
+
+// Typing
+let text="You are truly special 💫";
+let i=0;
+(function type(){
+  if(i<text.length){
+    document.getElementById("typing").innerHTML+=text[i++];
+    setTimeout(type,50);
+  }
+})();
+
+// Chat
+function startChat(){
+  let msgs=[
+    "Hey Heldu 🙂",
+    "I built something for you...",
+    "Because you're worth it",
+    "And today is your day 🎂"
+  ];
+  let i=0, box=document.getElementById("chatBox");
+
+  function send(){
+    if(i<msgs.length){
+      let d=document.createElement("div");
+      d.className="msg";
+      d.innerText=msgs[i++];
+      box.appendChild(d);
+      setTimeout(send,1000);
+    }
+  }
+  send();
+}
+
+// Slider
+let imgs=["img1.jpg","img2.jpg","img3.jpg"];
+let idx=0;
+setInterval(()=>{
+  idx=(idx+1)%imgs.length;
+  let el=document.getElementById("slide");
+  if(el) el.src=imgs[idx];
+},2500);
+
+// Secret
+function reveal(){
+  document.getElementById("secret").classList.add("show");
+}
+
+// Confetti
+function confetti(){
+  const c=document.getElementById("confetti");
+  const ctx=c.getContext("2d");
+  c.width=innerWidth;c.height=innerHeight;
+
+  let p=[];
+  for(let i=0;i<120;i++){
+    p.push({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*4});
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    p.forEach(e=>{
+      e.y+=2;
+      if(e.y>c.height) e.y=0;
+      ctx.fillRect(e.x,e.y,e.s,e.s);
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+
+</body>
+</html>
