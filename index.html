@@ -5,241 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Heldu 🎂</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
 body{
-  font-family:'Poppins',sans-serif;
-  background:#0f0f14;
-  color:white;
-  overflow:hidden;
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#111;
+  color:#fff;
+  text-align:center;
 }
 
-/* Cursor */
-.cursor{
-  width:20px;height:20px;border-radius:50%;
-  position:fixed;background:rgba(255,255,255,0.3);
-  pointer-events:none;transform:translate(-50%,-50%);
-}
-
-/* Pages */
 .page{
-  position:absolute;width:100%;height:100%;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  opacity:0;transform:translateY(40px);
-  transition:.6s ease;
-}
-.active{opacity:1;transform:translateY(0)}
-
-/* Card */
-.card{
-  background:rgba(255,255,255,0.05);
-  padding:30px;border-radius:20px;
-  backdrop-filter:blur(12px);
-  text-align:center;max-width:90%;
+  display:none;
+  padding:40px;
 }
 
-/* Button */
+.active{
+  display:block;
+}
+
 button{
-  margin-top:20px;padding:12px 25px;
-  border:none;border-radius:10px;
-  background:white;color:black;
-  font-weight:600;cursor:pointer;
+  padding:10px 20px;
+  margin-top:20px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
 }
 
-/* Input */
 input{
-  padding:10px;border-radius:8px;
-  border:none;margin-top:15px;text-align:center;
-}
-
-/* Chat */
-.chat{text-align:left;max-width:300px}
-.msg{
-  background:#1f1f2a;
-  padding:10px;border-radius:10px;
-  margin:5px 0;
-}
-
-/* Image */
-img{
-  width:250px;border-radius:12px;
-  margin-top:15px;
-}
-
-/* Hidden */
-.hidden{opacity:0}
-.show{opacity:1;transition:.5s}
-
-/* Confetti */
-canvas{
-  position:fixed;top:0;left:0;
-  pointer-events:none;
+  padding:10px;
+  border-radius:6px;
+  border:none;
+  margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="cursor" id="cursor"></div>
-<canvas id="confetti"></canvas>
-
-<!-- 🔊 Replace with real links -->
-<audio id="music" loop src="music.mp3"></audio>
-<audio id="voice" src="voice.mp3"></audio>
-
-<!-- PASSWORD -->
-<div class="page active" id="p1">
-  <div class="card">
-    <h2>Enter Password 🔐</h2>
-    <input id="pass" placeholder="Hint: her nickname">
-    <br>
-    <button onclick="check()">Unlock</button>
-  </div>
+<!-- PAGE 1 -->
+<div id="p1" class="page active">
+  <h2>Enter Password 🔐</h2>
+  <input id="pass" placeholder="Hint: her nickname">
+  <br>
+  <button onclick="check()">Unlock</button>
 </div>
 
-<!-- INTRO -->
-<div class="page" id="p2">
-  <div class="card">
-    <h1>Happy Birthday Heldu 🎉</h1>
-    <p id="typing"></p>
-    <button onclick="next(3)">Continue</button>
-  </div>
+<!-- PAGE 2 -->
+<div id="p2" class="page">
+  <h1>Happy Birthday Heldu 🎉</h1>
+  <p id="typing"></p>
+  <button onclick="nextPage(3)">Next</button>
 </div>
 
-<!-- CHAT -->
-<div class="page" id="p3">
-  <div class="card chat" id="chatBox"></div>
-  <button onclick="next(4)">Next</button>
+<!-- PAGE 3 -->
+<div id="p3" class="page">
+  <h2>Memories 📸</h2>
+  <img id="slide" src="https://via.placeholder.com/250">
+  <p>You are special 💖</p>
+  <button onclick="nextPage(4)">Next</button>
 </div>
 
-<!-- MEMORIES -->
-<div class="page" id="p4">
-  <div class="card">
-    <h2>Memories 📸</h2>
-    <img id="slide" src="img1.jpg">
-    <button onclick="next(5)">Next</button>
-  </div>
+<!-- PAGE 4 -->
+<div id="p4" class="page">
+  <h2>Secret 👀</h2>
+  <button onclick="reveal()">Reveal</button>
+  <p id="secret" style="display:none">You mean a lot to me ❤️</p>
+  <button onclick="nextPage(5)">Final</button>
 </div>
 
-<!-- SECRET -->
-<div class="page" id="p5">
-  <div class="card">
-    <h2>Tap for a secret 👀</h2>
-    <button onclick="reveal()">Reveal</button>
-    <p id="secret" class="hidden">You mean more than you know ❤️</p>
-    <button onclick="next(6)">Final</button>
-  </div>
-</div>
-
-<!-- FINAL -->
-<div class="page" id="p6">
-  <div class="card">
-    <h1>Heldu 💌</h1>
-    <p>
-      You bring something rare into my life.<br><br>
-      I appreciate you more than words can explain.<br><br>
-      Happy Birthday ❤️
-    </p>
-  </div>
+<!-- PAGE 5 -->
+<div id="p5" class="page">
+  <h1>Final Message 💌</h1>
+  <p>
+    Heldu,<br><br>
+    I appreciate you more than words can say.<br>
+    Happy Birthday ❤️
+  </p>
 </div>
 
 <script>
-// Cursor
-document.addEventListener("mousemove", e=>{
-  cursor.style.left=e.clientX+"px";
-  cursor.style.top=e.clientY+"px";
-});
-
-// Password
+// PASSWORD CHECK (FIXED)
 function check(){
-  if(document.getElementById("pass").value.toLowerCase()==="hel"){
-    next(2);
-  } else alert("Wrong password");
+  const value = document.getElementById("pass").value.trim().toLowerCase();
+
+  if(value === "hel"){
+    nextPage(2);
+  } else {
+    alert("Wrong password");
+  }
 }
 
-// Navigation
-function next(p){
-  document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+// PAGE SWITCH
+function nextPage(p){
+  document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
   document.getElementById("p"+p).classList.add("active");
-  document.getElementById("music").play().catch(()=>{});
+}
 
-  if(p===3) startChat();
-  if(p===6){
-    document.getElementById("voice").play();
-    confetti();
+// TYPING EFFECT
+const text = "You are truly special 💫";
+let i = 0;
+function type(){
+  if(i < text.length){
+    document.getElementById("typing").innerHTML += text.charAt(i);
+    i++;
+    setTimeout(type, 50);
   }
 }
 
-// Typing
-let text="You are truly special 💫";
-let i=0;
-(function type(){
-  if(i<text.length){
-    document.getElementById("typing").innerHTML+=text[i++];
-    setTimeout(type,50);
-  }
-})();
+// start typing when page loads
+type();
 
-// Chat
-function startChat(){
-  let msgs=[
-    "Hey Heldu 🙂",
-    "I built something for you...",
-    "Because you're worth it",
-    "And today is your day 🎂"
-  ];
-  let i=0, box=document.getElementById("chatBox");
+// IMAGE SLIDER (works even without local files)
+const images = [
+  "https://via.placeholder.com/250",
+  "https://via.placeholder.com/250/ff4b5c",
+  "https://via.placeholder.com/250/333"
+];
 
-  function send(){
-    if(i<msgs.length){
-      let d=document.createElement("div");
-      d.className="msg";
-      d.innerText=msgs[i++];
-      box.appendChild(d);
-      setTimeout(send,1000);
-    }
-  }
-  send();
-}
-
-// Slider
-let imgs=["img1.jpg","img2.jpg","img3.jpg"];
-let idx=0;
+let index = 0;
 setInterval(()=>{
-  idx=(idx+1)%imgs.length;
-  let el=document.getElementById("slide");
-  if(el) el.src=imgs[idx];
-},2500);
+  index = (index + 1) % images.length;
+  document.getElementById("slide").src = images[index];
+},2000);
 
-// Secret
+// SECRET
 function reveal(){
-  document.getElementById("secret").classList.add("show");
-}
-
-// Confetti
-function confetti(){
-  const c=document.getElementById("confetti");
-  const ctx=c.getContext("2d");
-  c.width=innerWidth;c.height=innerHeight;
-
-  let p=[];
-  for(let i=0;i<120;i++){
-    p.push({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*4});
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
-    p.forEach(e=>{
-      e.y+=2;
-      if(e.y>c.height) e.y=0;
-      ctx.fillRect(e.x,e.y,e.s,e.s);
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
+  document.getElementById("secret").style.display = "block";
 }
 </script>
 
